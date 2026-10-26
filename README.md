@@ -38,6 +38,16 @@ hello/SKILL.md:5: E09 link guide.md does not exist
 skillplumb: 1 skills, 1 errors, 0 warnings
 ```
 
+Names and messages are printed with every control character replaced by `?`: the C0 and C1 controls (U+0000 to U+001F and U+007F to U+009F), the line and paragraph separators U+2028 and U+2029, and the bidirectional formatting characters U+202A to U+202E and U+2066 to U+2069. A folder name that holds one of them cannot move or hide the text of a finding. The folder in this example is named `a`, U+202E and `b`:
+
+```sh
+$ mkdir -p "unsafe/$(printf 'a\342\200\256b')"
+$ printf 'x\n' > "unsafe/$(printf 'a\342\200\256b')/SKILL.md"
+$ go run . check unsafe
+a?b/SKILL.md:1: E03 front matter is missing or not closed
+skillplumb: 1 skills, 1 errors, 0 warnings
+```
+
 ## Checks
 
 | Code | Meaning |
