@@ -11,10 +11,18 @@ func (f Failure) Error() string {
 	return string(f)
 }
 
+// unsafeRune reports a rune that a terminal or a reader could take for a command or a reordering of
+// the text around it: C0 and C1 controls, the line and paragraph separators and the bidirectional
+// formatting characters.
+func unsafeRune(r rune) bool {
+	return r < 0x20 || (r >= 0x7f && r <= 0x9f) || r == 0x2028 || r == 0x2029 ||
+		(r >= 0x202a && r <= 0x202e) || (r >= 0x2066 && r <= 0x2069)
+}
+
 func shown(s string) string {
 	var b strings.Builder
 	for _, r := range s {
-		if r < 0x20 || r == 0x7f {
+		if unsafeRune(r) {
 			b.WriteByte('?')
 			continue
 		}
