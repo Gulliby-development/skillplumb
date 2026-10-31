@@ -13,6 +13,7 @@ type CommandOptions struct {
 	MaxLines int
 	Strict   bool
 	Ignore   map[string]bool
+	Sort     string
 }
 
 func parseOptions(args []string) (CommandOptions, string) {
@@ -36,6 +37,7 @@ func parseOptions(args []string) (CommandOptions, string) {
 		MaxDesc:  200,
 		MaxLines: 80,
 		Ignore:   make(map[string]bool),
+		Sort:     "name",
 	}
 	var maxDescValue string
 	var maxLinesValue string
@@ -43,13 +45,27 @@ func parseOptions(args []string) (CommandOptions, string) {
 	maxDescSeen := false
 	maxLinesSeen := false
 	strictSeen := false
+	sortSeen := false
+	sortValue := ""
 	dirSeen := false
 
 	for index := 1; index < len(args); index++ {
 		arg := args[index]
 		if strings.HasPrefix(arg, "--") {
 			if command == "index" {
-				return CommandOptions{}, "unknown option " + shownArgument(arg)
+				if arg != "--sort" {
+					return CommandOptions{}, "unknown option " + shownArgument(arg)
+				}
+				if sortSeen {
+					return CommandOptions{}, "--sort given twice"
+				}
+				sortSeen = true
+				if index+1 >= len(args) {
+					return CommandOptions{}, "--sort needs a value"
+				}
+				index++
+				sortValue = args[index]
+				continue
 			}
 			switch arg {
 			case "--max-desc":
@@ -115,6 +131,13 @@ func parseOptions(args []string) (CommandOptions, string) {
 				shownArgument(maxLinesValue)
 		}
 		options.MaxLines = value
+	}
+	if sortSeen {
+		if sortValue != "name" && sortValue != "lines" && sortValue != "links" && sortValue != "desc" {
+			return CommandOptions{}, "--sort needs one of name, lines, links, desc, got " +
+				shownArgument(sortValue)
+		}
+		options.Sort = sortValue
 	}
 	for _, code := range ignoreValues {
 		if !validCode(code) {

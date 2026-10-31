@@ -72,7 +72,40 @@ func renderCheck(skills []SkillResult, ignored map[string]bool, strict bool) (st
 	return output.String(), 0
 }
 
-func renderIndex(skills []SkillResult) string {
+// sortedForIndex orders the index rows: "name" keeps the folder order; "lines", "links" and "desc" put the
+// largest value first (a skill without a description counts as -1 for "desc"), skills that could not be
+// read come last, and equal values keep the folder order.
+func sortedForIndex(skills []SkillResult, sortKey string) []SkillResult {
+	ordered := append([]SkillResult(nil), skills...)
+	if sortKey == "name" {
+		return ordered
+	}
+	value := func(skill SkillResult) int {
+		switch sortKey {
+		case "lines":
+			return skill.BodyLines
+		case "links":
+			return skill.LinkCount
+		}
+		if skill.Description == "" {
+			return -1
+		}
+		return skill.DescriptionPoints
+	}
+	sort.SliceStable(ordered, func(i, j int) bool {
+		if ordered[i].Fatal != ordered[j].Fatal {
+			return !ordered[i].Fatal
+		}
+		if ordered[i].Fatal {
+			return false
+		}
+		return value(ordered[i]) > value(ordered[j])
+	})
+	return ordered
+}
+
+func renderIndex(skills []SkillResult, sortKey string) string {
+	skills = sortedForIndex(skills, sortKey)
 	rows := make([][]string, 0, len(skills))
 	for _, skill := range skills {
 		if skill.Fatal {

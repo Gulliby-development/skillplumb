@@ -15,7 +15,7 @@ func TestHelpOutputAndExit(t *testing.T) {
 	if status != 0 {
 		t.Errorf("Run(--help) status = %d, want 0", status)
 	}
-	if got, want := io.Stdout, "usage: skillplumb check DIR [--max-desc N] [--max-lines N] [--ignore CODE]... [--strict]\n       skillplumb index DIR\n       skillplumb --help\n"; got != want {
+	if got, want := io.Stdout, "usage: skillplumb check DIR [--max-desc N] [--max-lines N] [--ignore CODE]... [--strict]\n       skillplumb index DIR [--sort KEY]\n       skillplumb --help\n"; got != want {
 		t.Errorf("Run(--help) stdout = %q, want %q", got, want)
 	}
 	if io.Stderr != "" {
