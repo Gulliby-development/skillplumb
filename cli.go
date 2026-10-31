@@ -6,7 +6,7 @@ import (
 )
 
 const helpText = "usage: skillplumb check DIR [--max-desc N] [--max-lines N] [--ignore CODE]... [--strict]\n" +
-	"       skillplumb index DIR\n" +
+	"       skillplumb index DIR [--sort KEY]\n" +
 	"       skillplumb --help\n"
 
 func Run(args []string, io Io) int {
@@ -48,7 +48,7 @@ func Run(args []string, io Io) int {
 		skills = append(skills, analyzeSkill(io, skillPath, folder, options.MaxDesc, options.MaxLines))
 	}
 	if options.Command == "index" {
-		io.Out(renderIndex(skills))
+		io.Out(renderIndex(skills, options.Sort))
 		return 0
 	}
 	addDescriptionDuplicates(skills)

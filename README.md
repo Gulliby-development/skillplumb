@@ -26,6 +26,8 @@ Run `skillplumb check DIR` to lint the immediate visible skill folders under `DI
 
 Run `skillplumb index DIR` to print a table of each skill's body line count, local link count, and description code-point count. It prints no findings. Use `skillplumb --help` to print the command synopsis.
 
+The `index` command accepts `--sort KEY` to order the rows: `name` (the default, folder order), or `lines`, `links` or `desc` to put the skill with the largest value of that column first. Skills with equal values, and skills whose `SKILL.md` could not be read (they come last), stay in folder order, and a skill without a description counts as -1 for `desc`. A key that is not one of the four is the usage error `skillplumb: --sort needs one of name, lines, links, desc, got KEY` (exit 2), and `check` does not take the option.
+
 The `check` command accepts `--max-desc N` (default 200 code points), `--max-lines N` (default 80 body lines), repeatable `--ignore CODE` to omit findings with a diagnostic code, and `--strict` to make warnings produce exit status 1.
 
 Run all three commands in order from the repository root: the first two create the fixture that the third checks. The `go run .` invocation stands in for running the installed `skillplumb` command; the lines below it are the program's output.
